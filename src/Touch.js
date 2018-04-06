@@ -377,6 +377,12 @@ export class TouchBackend {
             this._mouseClientOffset = clientOffset;
         }
         this.waitingForDelay = false
+
+        this.actions.beginDrag(this.moveStartSourceIds, {
+          clientOffset: this._mouseClientOffset,
+          getSourceClientOffset: this.getSourceClientOffset,
+          publishSource: false
+        });
     }
 
     handleTopMoveStartDelay (e) {
