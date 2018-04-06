@@ -335,6 +335,7 @@ export class TouchBackend {
     }
 
     handleTopMoveStartCapture (e) {
+        console.log(`handleTopMoveStartCapture (${e})`)
         if (!eventShouldStartDrag(e)) {
             return;
         }
@@ -343,6 +344,7 @@ export class TouchBackend {
     }
 
     handleMoveStart (sourceId) {
+      console.log(`handleMoveStart (${sourceId})`)
         // Just because we received an event doesn't necessarily mean we need to collect drag sources.
         // We only collect start collecting drag sources on touch and left mouse events.
         if (Array.isArray(this.moveStartSourceIds)) {
@@ -359,6 +361,8 @@ export class TouchBackend {
     }
 
     handleTopMoveStart (e) {
+        console.log("handleTopMoveStart")
+
         if (!eventShouldStartDrag(e)) {
             return;
         }
@@ -388,6 +392,7 @@ export class TouchBackend {
     }
 
     handleTopMoveCapture (e) {
+        console.log(`handleTopMoveCapture (${JSON.stringify(e)})`)
         this.dragOverTargetIds = [];
     }
 
@@ -396,6 +401,7 @@ export class TouchBackend {
     }
 
     handleTopMove (e) {
+      console.log(`handleTopMove (${JSON.stringify(e)})`)
         clearTimeout(this.timeout);
         if (this.waitingForDelay) {
             return;
@@ -472,6 +478,7 @@ export class TouchBackend {
     }
 
     handleTopMoveEndCapture (e) {
+      console.log(`handleTopMoveEndCapture (e)`)
         if (!eventShouldEndDrag(e)) {
             return;
         }
