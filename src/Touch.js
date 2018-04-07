@@ -156,6 +156,7 @@ export class TouchBackend {
 
         this.enableKeyboardEvents = options.enableKeyboardEvents;
         this.enableMouseEvents = options.enableMouseEvents;
+        this.delayHoldTouchStart = options.delayHoldTouchStart;
         this.delayTouchStart = options.delayTouchStart;
         this.delayMouseStart = options.delayMouseStart;
         this.ignoreContextMenu = options.ignoreContextMenu;
@@ -378,11 +379,18 @@ export class TouchBackend {
         }
         this.waitingForDelay = false
 
-        this.actions.beginDrag(this.moveStartSourceIds, {
-          clientOffset: this._mouseClientOffset,
-          getSourceClientOffset: this.getSourceClientOffset,
-          publishSource: false
-        });
+        console.log("this.moveStartSourceIds: " + this.moveStartSourceIds)
+
+        const sourceIds = this.moveStartSourceIds
+
+        this.startTouchTimer = setTimeout(() => {
+          console.log("this.moveStartSourceIds: " + sourceIds)
+          this.actions.beginDrag(sourceIds, {
+            clientOffset: this._mouseClientOffset,
+            getSourceClientOffset: this.getSourceClientOffset,
+            publishSource: false
+          });
+        }, this.delayHoldTouchStart)
     }
 
     handleTopMoveStartDelay (e) {
@@ -418,21 +426,6 @@ export class TouchBackend {
 
         if (!clientOffset) {
             return;
-        }
-
-        // If we're not dragging and we've moved a little, that counts as a drag start
-        if (
-            !this.monitor.isDragging() &&
-            this._mouseClientOffset.hasOwnProperty('x') &&
-            moveStartSourceIds && 
-            distance(this._mouseClientOffset.x, this._mouseClientOffset.y, clientOffset.x, clientOffset.y) >
-                (this.touchSlop ? this.touchSlop : 0)) {
-            this.moveStartSourceIds = null;
-            this.actions.beginDrag(moveStartSourceIds, {
-                clientOffset: this._mouseClientOffset,
-                getSourceClientOffset: this.getSourceClientOffset,
-                publishSource: false
-            });
         }
 
         if (!this.monitor.isDragging()) {
@@ -484,6 +477,10 @@ export class TouchBackend {
     }
 
     handleTopMoveEndCapture (e) {
+      if (this.startTouchTimer) {
+        clearTimeout(this.startTouchTimer);
+      }
+
       console.log(`handleTopMoveEndCapture (e)`)
         if (!eventShouldEndDrag(e)) {
             return;
