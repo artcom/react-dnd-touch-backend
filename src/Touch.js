@@ -376,21 +376,36 @@ export class TouchBackend {
         const clientOffset = getEventClientOffset(e);
         if (clientOffset) {
             this._mouseClientOffset = clientOffset;
+            this.current = clientOffset;
         }
         this.waitingForDelay = false
 
+        console.log(this._mouseClientOffset.x)
+        console.log(this._mouseClientOffset.y)
         console.log("this.moveStartSourceIds: " + this.moveStartSourceIds)
 
         const sourceIds = this.moveStartSourceIds
 
         this.startTouchTimer = setTimeout(() => {
           console.log("this.moveStartSourceIds: " + sourceIds)
-          this.actions.beginDrag(sourceIds, {
-            clientOffset: this._mouseClientOffset,
-            getSourceClientOffset: this.getSourceClientOffset,
-            publishSource: false
-          });
+
+          if (this.touchPositionDidNotChange(clientOffset)) {
+            this.actions.beginDrag(sourceIds, {
+              clientOffset: this._mouseClientOffset,
+              getSourceClientOffset: this.getSourceClientOffset,
+              publishSource: false
+            });
+          }
         }, this.delayHoldTouchStart)
+    }
+
+    touchPositionDidNotChange(origin) {
+      console.log(this.current.x)
+      console.log(this.current.y)
+
+      const distanceMoved = distance(this.current.x, this.current.y, origin.x, origin.y)
+      console.log(distanceMoved)
+      return distanceMoved === 0
     }
 
     handleTopMoveStartDelay (e) {
@@ -423,6 +438,8 @@ export class TouchBackend {
 
         const { moveStartSourceIds, dragOverTargetIds } = this;
         const clientOffset = getEventClientOffset(e);
+
+        this.current = clientOffset
 
         if (!clientOffset) {
             return;
